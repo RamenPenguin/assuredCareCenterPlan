@@ -107,31 +107,91 @@ def generate_pdf(topic, problems, interventions, goals):
     doc.close()
     return pdf_bytes
 
-def show_pdf(pdf_bytes, height: int = 700):
-    """Embed PDF + provide reliable fallback link inside an expander."""
+def show_pdf(pdf_bytes, height: int = 700, filename: str = "output.pdf"):
+    """
+    Embed PDF inside a Streamlit expander and provide reliable
+    user-triggered "Open in new tab" and "Download" buttons.
+    """
+    # base64 encode
     b64 = base64.b64encode(pdf_bytes).decode("utf-8")
-    unique_id = str(uuid.uuid4())  # ensures re-render on every generate
+    uid = str(uuid.uuid4()).replace("-", "")[:12]  # short unique id
 
-    with st.expander("📄 Preview PDF", expanded=False):
-        # Embedded viewer
-        html(
-            f"""
-            <iframe
-                src="data:application/pdf;base64,{b64}"
-                width="100%"
-                height="{height}"
-                style="border:none;"
-            ></iframe>
-            """,
-            height=height,
-            scrolling=True,
-        )
+    # Build HTML: iframe + JS buttons that convert b64 -> Blob -> open/download
+    html_code = f"""
+    <div style="width:100%;">
+      <!-- preview iframe -->
+      <iframe
+        id="pdf_iframe_{uid}"
+        src="data:application/pdf;base64,{b64}"
+        width="100%"
+        height="{height}"
+        style="border:1px solid #ddd;"
+      ></iframe>
 
-        # Fallback open-in-new-tab link (updates every time)
-        st.markdown(
-            f'<a id="{unique_id}" href="data:application/pdf;base64,{b64}" target="_blank">🔗 Open PDF in new tab</a>',
-            unsafe_allow_html=True,
-        )
+      <!-- controls -->
+      <div style="margin-top:8px; display:flex; gap:8px; align-items:center;">
+        <button id="open_btn_{uid}" style="padding:6px 10px; cursor:pointer;">🔗 Open in new tab</button>
+        <button id="download_btn_{uid}" style="padding:6px 10px; cursor:pointer;">⬇️ Download PDF</button>
+        <span style="color:#666; font-size:12px; margin-left:8px;">(If nothing happens, use Download.)</span>
+      </div>
+    </div>
+
+    <script>
+    // small helper: convert base64 string to a Blob
+    function b64ToBlob(b64, contentType='application/pdf', sliceSize=512) {{
+      var byteChars = atob(b64);
+      var byteArrays = [];
+      for (var offset = 0; offset < byteChars.length; offset += sliceSize) {{
+        var slice = byteChars.slice(offset, offset + sliceSize);
+        var byteNumbers = new Array(slice.length);
+        for (var i = 0; i < slice.length; i++) {{
+          byteNumbers[i] = slice.charCodeAt(i);
+        }}
+        var byteArray = new Uint8Array(byteNumbers);
+        byteArrays.push(byteArray);
+      }}
+      var blob = new Blob(byteArrays, {{ type: contentType }});
+      return blob;
+    }}
+
+    // set up click handlers (user-initiated -> allowed by browser)
+    document.getElementById("open_btn_{uid}").addEventListener("click", function() {{
+      try {{
+        var blob = b64ToBlob("{b64}");
+        var blobUrl = URL.createObjectURL(blob);
+        window.open(blobUrl, "_blank");
+      }} catch (err) {{
+        console.error(err);
+        alert("Unable to open PDF in new tab. Please use Download.");
+      }}
+    }});
+
+    document.getElementById("download_btn_{uid}").addEventListener("click", function() {{
+      try {{
+        var blob = b64ToBlob("{b64}");
+        var blobUrl = URL.createObjectURL(blob);
+        var a = document.createElement("a");
+        a.href = blobUrl;
+        a.download = "{filename}";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(blobUrl);
+      }} catch (err) {{
+        console.error(err);
+        alert("Download failed.");
+      }}
+    }});
+    </script>
+    """
+
+    # Put HTML inside an expander to keep the page tidy.
+    with st.expander("📄 Preview PDF", expanded=True):
+        # height argument ensures the component area is big enough
+        html(html_code, height=height + 90, scrolling=True)
+
+    # Also give a Streamlit-native download button (as a second fallback)
+    st.download_button("📥 Download PDF (fallback)", data=pdf_bytes, file_name=filename, mime="application/pdf")
 
 st.title("Nursing Home Care Plan Generator")
 
