@@ -1,6 +1,7 @@
 import streamlit as st
 import fitz
 import base64
+import uuid
 from streamlit.components.v1 import html
 
 # ------------------------
