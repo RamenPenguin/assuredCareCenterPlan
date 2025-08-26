@@ -107,30 +107,30 @@ def generate_pdf(topic, problems, interventions, goals):
     return pdf_bytes
 
 def show_pdf(pdf_bytes, height: int = 700):
-    """Embed PDF in the Streamlit app (more robust than st.markdown)."""
+    """Embed PDF + provide reliable fallback link inside an expander."""
     b64 = base64.b64encode(pdf_bytes).decode("utf-8")
+    unique_id = str(uuid.uuid4())  # ensures re-render on every generate
 
-    # Main embedded viewer
-    html(
-        f"""
-        <div style="width:100%;height:{height}px;">
+    with st.expander("📄 Preview PDF", expanded=False):
+        # Embedded viewer
+        html(
+            f"""
             <iframe
                 src="data:application/pdf;base64,{b64}"
                 width="100%"
                 height="{height}"
                 style="border:none;"
             ></iframe>
-        </div>
-        """,
-        height=height + 20,
-        scrolling=True,
-    )
+            """,
+            height=height,
+            scrolling=True,
+        )
 
-    # Fallback open-in-new-tab link (helps on iOS/Safari if iframe is blocked)
-    st.markdown(
-        f'<p style="margin-top:0.5rem;"><a href="data:application/pdf;base64,{b64}" target="_blank">Open PDF in new tab</a></p>',
-        unsafe_allow_html=True,
-    )
+        # Fallback open-in-new-tab link (updates every time)
+        st.markdown(
+            f'<a id="{unique_id}" href="data:application/pdf;base64,{b64}" target="_blank">🔗 Open PDF in new tab</a>',
+            unsafe_allow_html=True,
+        )
 
 st.title("Nursing Home Care Plan Generator")
 
