@@ -110,19 +110,15 @@ pdf_link_container = st.empty()
 
 def show_pdf(pdf_bytes, filename="output.pdf"):
     """
-    Save the PDF to a temporary file and provide a link
-    that opens it in a new browser tab for viewing/printing.
+    Show a single button that opens the PDF in the browser for viewing/printing.
     """
-    # Create a temporary file
-    temp_pdf = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
-    temp_pdf.write(pdf_bytes)
-    temp_pdf.flush()
-    temp_pdf.close()
-
-    # Provide a link to open in a new tab
-    pdf_link_container.markdown(
-        f'<a href="file://{temp_pdf.name}" target="_blank">📄 Open PDF for Print</a>',
-        unsafe_allow_html=True
+    pdf_link_container.download_button(
+        label="📄 Open PDF for Print",
+        data=pdf_bytes,
+        file_name=filename,
+        mime="application/pdf",
+        key="pdf_print_button",
+        as_file=False  # Important: opens in-browser instead of downloading
     )
 
 st.title("Nursing Home Care Plan Generator")
