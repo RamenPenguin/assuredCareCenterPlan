@@ -105,7 +105,7 @@ def generate_pdf(topic, problems, interventions, goals):
     doc.close()
     return pdf_bytes
 
-pdf_link_container = st.empty()
+pdf_button_container = st.empty()
 
 def show_pdf(pdf_bytes, filename="output.pdf"):
     """
