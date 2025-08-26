@@ -1,0 +1,4 @@
+streamlit
+pymupdf
+fitz
+base64
