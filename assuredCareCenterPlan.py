@@ -1,6 +1,7 @@
 import streamlit as st
 import fitz
 import base64
+from streamlit.components.v1 import html
 
 # ------------------------
 # Data
@@ -105,20 +106,35 @@ def generate_pdf(topic, problems, interventions, goals):
     doc.close()
     return pdf_bytes
 
-def show_pdf(pdf_bytes):
-    """Embed PDF in the Streamlit app."""
-    base64_pdf = base64.b64encode(pdf_bytes).decode("utf-8")
-    pdf_display = f'<iframe src="data:application/pdf;base64,{base64_pdf}" width="100%" height="600" type="application/pdf"></iframe>'
-    st.markdown(pdf_display, unsafe_allow_html=True)
+def show_pdf(pdf_bytes, height: int = 700):
+    """Embed PDF in the Streamlit app (more robust than st.markdown)."""
+    b64 = base64.b64encode(pdf_bytes).decode("utf-8")
 
-# ------------------------
-# Streamlit UI
-# ------------------------
+    # Main embedded viewer
+    html(
+        f"""
+        <div style="width:100%;height:{height}px;">
+            <iframe
+                src="data:application/pdf;base64,{b64}"
+                width="100%"
+                height="{height}"
+                style="border:none;"
+            ></iframe>
+        </div>
+        """,
+        height=height + 20,
+        scrolling=True,
+    )
+
+    # Fallback open-in-new-tab link (helps on iOS/Safari if iframe is blocked)
+    st.markdown(
+        f'<p style="margin-top:0.5rem;"><a href="data:application/pdf;base64,{b64}" target="_blank">Open PDF in new tab</a></p>',
+        unsafe_allow_html=True,
+    )
+
 st.title("Nursing Home Care Plan Generator")
 
-# Topic selection
 topic = st.selectbox("Select a topic:", list(data.keys()))
-
 if topic:
     st.subheader("Select Problems")
     problems = st.multiselect("Choose problems:", data[topic]["Problems"])
@@ -133,14 +149,5 @@ if topic:
         pdf_bytes = generate_pdf(topic, problems, interventions, goals)
         if pdf_bytes:
             st.success("PDF generated!")
-
-            # ✅ Embedded PDF preview
-            show_pdf(pdf_bytes)
-
-            # ✅ Download button
-            st.download_button(
-                "Download PDF",
-                data=pdf_bytes,
-                file_name="output.pdf",
-                mime="application/pdf"
-            )
+            show_pdf(pdf_bytes)  # 👈 embedded preview
+            st.download_button("Download PDF", data=pdf_bytes, file_name="output.pdf", mime="application/pdf")
