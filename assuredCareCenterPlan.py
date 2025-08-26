@@ -107,31 +107,21 @@ def generate_pdf(topic, problems, interventions, goals):
     doc.close()
     return pdf_bytes
 
+pdf_link_container = st.empty()
+
 def show_pdf(pdf_bytes, filename: str = "output.pdf"):
     """
     Show a single user-initiated link to open/download the PDF.
-    Guarantees that the link updates immediately after generating a new PDF.
+    Guaranteed to update immediately without refresh.
     """
-    # Encode PDF as Base64
     b64 = base64.b64encode(pdf_bytes).decode("utf-8")
+    unique_id = str(uuid.uuid4()).replace("-", "")[:12]
 
-    # Create a unique key for Streamlit container to force re-render
-    unique_key = str(uuid.uuid4()).replace("-", "")[:12]
-
-    # Use st.container to isolate this element
-    with st.container():
-        st.markdown(
-            f'<a id="{unique_key}" href="data:application/pdf;base64,{b64}" target="_blank">📄 Open/Download PDF</a>',
-            unsafe_allow_html=True
-        )
-        # Optional fallback: download button
-        st.download_button(
-            label="⬇️ Download PDF",
-            data=pdf_bytes,
-            file_name=filename,
-            mime="application/pdf",
-            key=unique_key  # ensures unique button each run
-        )
+    # Clear and update the container with a fresh link
+    pdf_link_container.markdown(
+        f'<a id="{unique_id}" href="data:application/pdf;base64,{b64}" target="_blank">📄 Open/Download PDF</a>',
+        unsafe_allow_html=True
+    )
 
 st.title("Nursing Home Care Plan Generator")
 
