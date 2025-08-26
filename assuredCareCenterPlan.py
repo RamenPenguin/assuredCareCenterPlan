@@ -1,7 +1,7 @@
 import streamlit as st
 import fitz
 import base64
-import tempfile
+import uuid
 
 # ------------------------
 # Data
@@ -110,16 +110,16 @@ pdf_link_container = st.empty()
 
 def show_pdf(pdf_bytes, filename="output.pdf"):
     """
-    Show a single button that opens the PDF in the browser for viewing/printing.
+    Show a single link that opens the PDF in a new tab for viewing/printing.
     """
-    pdf_link_container.download_button(
-        label="📄 Open PDF for Print",
-        data=pdf_bytes,
-        file_name=filename,
-        mime="application/pdf",
-        key="pdf_print_button",
-        as_file=False  # Important: opens in-browser instead of downloading
-    )
+    b64 = base64.b64encode(pdf_bytes).decode("utf-8")
+    unique_id = str(uuid.uuid4()).replace("-", "")[:12]
+
+    # HTML link pointing to a base64-encoded PDF
+    html_code = f'<a id="{unique_id}" href="data:application/pdf;base64,{b64}" target="_blank">📄 Open PDF for Print</a>'
+
+    # Update container to avoid refresh issues
+    pdf_link_container.markdown(html_code, unsafe_allow_html=True)
 
 st.title("Nursing Home Care Plan Generator")
 
