@@ -3,7 +3,7 @@ import fitz
 import base64
 
 # ------------------------
-# Data (same as before, truncated here)
+# Data
 # ------------------------
 data = {
     "Allergic Reaction (Rx_______________)": {
@@ -100,7 +100,7 @@ def generate_pdf(topic, problems, interventions, goals):
     lines = wrap_text("\n".join(goals), fontname, fontsize, 205, doc)
     page.insert_text((346, 175), lines, fontsize=fontsize, fontname=fontname)
 
-    # Save to memory
+    # Save PDF into memory instead of file
     pdf_bytes = doc.write()
     doc.close()
     return pdf_bytes
@@ -134,10 +134,10 @@ if topic:
         if pdf_bytes:
             st.success("PDF generated!")
 
-            # Auto-preview
+            # ✅ Embedded PDF preview
             show_pdf(pdf_bytes)
 
-            # Download button
+            # ✅ Download button
             st.download_button(
                 "Download PDF",
                 data=pdf_bytes,
