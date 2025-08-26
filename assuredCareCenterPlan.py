@@ -108,7 +108,7 @@ def generate_pdf(topic, problems, interventions, goals):
 
 pdf_link_container = st.empty()
 
-def show_pdf_for_print(pdf_bytes, filename="output.pdf"):
+def show_pdf(pdf_bytes, filename="output.pdf"):
     """
     Save the PDF to a temporary file and provide a link
     that opens it in a new browser tab for viewing/printing.
