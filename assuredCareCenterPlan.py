@@ -1,8 +1,7 @@
 import streamlit as st
 import fitz
 import base64
-import uuid
-from streamlit.components.v1 import html
+import tempfile
 
 # ------------------------
 # Data
@@ -109,17 +108,20 @@ def generate_pdf(topic, problems, interventions, goals):
 
 pdf_link_container = st.empty()
 
-def show_pdf(pdf_bytes, filename: str = "output.pdf"):
+def show_pdf_for_print(pdf_bytes, filename="output.pdf"):
     """
-    Show a single user-initiated link to open/download the PDF.
-    Guaranteed to update immediately without refresh.
+    Save the PDF to a temporary file and provide a link
+    that opens it in a new browser tab for viewing/printing.
     """
-    b64 = base64.b64encode(pdf_bytes).decode("utf-8")
-    unique_id = str(uuid.uuid4()).replace("-", "")[:12]
+    # Create a temporary file
+    temp_pdf = tempfile.NamedTemporaryFile(delete=False, suffix=".pdf")
+    temp_pdf.write(pdf_bytes)
+    temp_pdf.flush()
+    temp_pdf.close()
 
-    # Clear and update the container with a fresh link
+    # Provide a link to open in a new tab
     pdf_link_container.markdown(
-        f'<a id="{unique_id}" href="data:application/pdf;base64,{b64}" target="_blank">📄 Open/Download PDF</a>',
+        f'<a href="file://{temp_pdf.name}" target="_blank">📄 Open PDF for Print</a>',
         unsafe_allow_html=True
     )
 
