@@ -55,6 +55,11 @@ data = {
         "Problems" : ["Chronic pain r/t BMI above normal", "Chronic pain r/t fatigue/musculoskeeltal dysfunction", "Chronic pain r/t injury agent", "Chronic pain r/t psychological distress", "Chronic pain r/t physiological factor", "Chronic pain r/t ________"],
         "Interventions" : ["RN will perform client's pain assessment with VS on a regular basis", "RN will review and update pain management plan (pharmacological and non-pharmacological approaches)", "RN will monitor for signs of depression/anxiety", "All staffs will be made aware of client's need for supervision with ambulation"],
         "Goals" : ["Client will tolerate ADL while at the ADC", "Client will verbalize tolerable pain level while at the ADC", "Client will remain VSS", "Client will remain free from falls"]
+    },
+    "Anxiety" : {
+        "Problems" : ["Anxiety", "Impaired mood regulation", "Insomnia", "Powerlessness", "Fatigue", "Chronic low self esteem", "Social isolation", "Risk for suicidal behavior", "Self neglect", "Ineffective health maintenance behavior"],
+        "Interventions" : ["Assess clients' level of anxiety and physical reaction to anxiety", "R/o alcohol, sedative, or smoking withdrawal as the cause of anxiety", "Encourage clients to use positive talk", "Remove sources of anxiety if possible", "RN will assess suicide risk", "RN will use therapeutic communication approaches to encourage clients to express feelings", "RN will educate client in sleep hygiene practices", "RN will encourage self care in ADL", "RN will educate clients on medication compliance", "RN will educate clients in recognizing triggers and symptons and coping strategies to manage anxiety/depression"],
+        "Goals" : ["Client will use effective coping strategies to decrease stress", "Client will remain safe while at ADC", "Client will show improvement in performing ADL", "Client will have positive relationship with staff and peers at ADC", "Client will report medication compliance at home", "Client will remain VSS at ADC", "Client will demonstrate tedchnique to control anxiety symptoms", "Client will be able to identify symptoms of anxiety/depression", "Client will have facial expression/posture/gestures that reflect decreased distress", "Client will report sleep improvement", "Absence of suicidal ideation while at the ADC"]
     }
 }
 
